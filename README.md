@@ -24,7 +24,13 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+API for ["интерактивной доски 305 кафедры"](https://github.com/NZ-WEB/KAF305-SPA) MAI`s institute.
+
+## Constants
+
+```bash
+$ JWT_SECRET: string; — secret row for JWT generator
+```
 
 ## Installation
 
@@ -64,9 +70,8 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Author - [NZ-WEB](https://github.com/NZ-WEB)
+
 
 ## License
 
