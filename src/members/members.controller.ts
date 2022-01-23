@@ -6,7 +6,7 @@ import {
   Param,
   Post,
   Put,
-  Req,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -16,6 +16,7 @@ import { User } from '@app/user/decorators/user.decorator';
 import { UserEntity } from '@app/user/user.entity';
 import { MembersService } from '@app/members/members.service';
 import { MembersDto } from '@app/members/dto/members.dto';
+import { MemberResponseInterface } from '@app/members/types/memberResponse.interface';
 import { MembersResponseInterface } from '@app/members/types/membersResponse.interface';
 
 @Controller('members')
@@ -28,7 +29,7 @@ export class MembersController {
   async createMember(
     @User() currentUser: UserEntity,
     @Body('members') membersDto: MembersDto,
-  ): Promise<MembersResponseInterface> {
+  ): Promise<MemberResponseInterface> {
     const member = await this.membersService.createMember(
       currentUser,
       membersDto,
@@ -36,10 +37,18 @@ export class MembersController {
     return this.membersService.buildMembersResponse(member);
   }
 
+  @Get()
+  async findAll(
+    @User('id') currentUserId: number,
+    @Query() query: any,
+  ): Promise<MembersResponseInterface> {
+    return await this.membersService.findAll(query);
+  }
+
   @Get(':slug')
   async getMember(
     @Param('slug') slug: string,
-  ): Promise<MembersResponseInterface> {
+  ): Promise<MemberResponseInterface> {
     const member = await this.membersService.findBySlug(slug);
     return this.membersService.buildMembersResponse(member);
   }
@@ -59,7 +68,7 @@ export class MembersController {
   async updateArticle(
     @Body('members') memberDto: MembersDto,
     @Param('slug') slug: string,
-  ): Promise<MembersResponseInterface> {
+  ): Promise<MemberResponseInterface> {
     const member = await this.membersService.updateMember(memberDto, slug);
     return await this.membersService.buildMembersResponse(member);
   }

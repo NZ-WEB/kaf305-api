@@ -1,7 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
 export class MembersDto {
-
   @IsNotEmpty()
   readonly fullName: string;
 

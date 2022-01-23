@@ -12,7 +12,7 @@ const config: ConnectionOptions = {
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
   cli: {
     migrationsDir: 'src/migrations',
-  }
+  },
 };
 
 export default config;

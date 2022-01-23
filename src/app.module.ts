@@ -9,7 +9,12 @@ import { AuthMiddleware } from '@app/user/middlewares/auth.middleware';
 import { MembersModule } from './members/members.module';
 
 @Module({
-  imports: [TagModule, TypeOrmModule.forRoot(ormconfig), UserModule, MembersModule],
+  imports: [
+    TagModule,
+    TypeOrmModule.forRoot(ormconfig),
+    UserModule,
+    MembersModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

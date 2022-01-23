@@ -2,42 +2,67 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserEntity } from '@app/user/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MembersEntity } from '@app/members/members.entity';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, getRepository, Repository } from 'typeorm';
 import { MembersDto } from '@app/members/dto/members.dto';
-import { MembersResponseInterface } from '@app/members/types/membersResponse.interface';
+import { MemberResponseInterface } from '@app/members/types/memberResponse.interface';
 import slugify from 'slugify';
+import { MembersResponseInterface } from '@app/members/types/membersResponse.interface';
 
 @Injectable()
 export class MembersService {
   constructor(
     @InjectRepository(MembersEntity)
     private readonly membersRepository: Repository<MembersEntity>,
+    @InjectRepository(MembersEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
+  async findAll(query: any): Promise<MembersResponseInterface> {
+    const queryBuilder = getRepository(MembersEntity).createQueryBuilder(
+      'members',
+    );
+
+    const membersCount = await queryBuilder.getCount();
+
+    if (query.tag) {
+      queryBuilder.andWhere('members.tagList LIKE :tag', {
+        tag: `%${query.tag}%`,
+      });
+    }
+
+    if (query.limit) {
+      queryBuilder.limit(query.limit);
+    }
+
+    if (query.offset) {
+      queryBuilder.offset(query.offset);
+    }
+
+    const members = await queryBuilder.getMany();
+
+    return { members, membersCount };
+  }
   async createMember(
     currentUser: UserEntity,
     membersDto: MembersDto,
   ): Promise<MembersEntity> {
-    const members = new MembersEntity();
-    Object.assign(members, membersDto);
+    const member = new MembersEntity();
+    Object.assign(member, membersDto);
 
-    if (!members.publications) {
-      members.publications = [];
+    if (!member.publications) {
+      member.publications = [];
     }
 
-    members.slug = this.getSlug(membersDto.fullName);
+    member.slug = this.getSlug(membersDto.fullName);
 
-    return await this.membersRepository.save(members);
+    return await this.membersRepository.save(member);
   }
 
   async findBySlug(slug: string): Promise<MembersEntity> {
     return await this.membersRepository.findOne({ slug: slug });
   }
 
-  async deleteMember(
-    slug: string,
-    currentUserId: number,
-  ): Promise<DeleteResult> {
+  async deleteMember(slug: string): Promise<DeleteResult> {
     const members = await this.findBySlug(slug);
 
     if (!members) {
@@ -67,7 +92,7 @@ export class MembersService {
 
   async buildMembersResponse(
     members: MembersEntity,
-  ): Promise<MembersResponseInterface> {
+  ): Promise<MemberResponseInterface> {
     return { members };
   }
 
