@@ -59,7 +59,7 @@ export class MembersController {
     @User('id') currentUserId: number,
     @Param('slug') slug: string,
   ) {
-    return await this.membersService.deleteMember(slug, currentUserId);
+    return await this.membersService.deleteMember(slug);
   }
 
   @Put(':slug')
