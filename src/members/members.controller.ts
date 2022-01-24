@@ -64,8 +64,7 @@ export class MembersController {
 
   @Put(':slug')
   @UseGuards(AuthGuard)
-  @UsePipes(new ValidationPipe())
-  async updateArticle(
+  async updateMember(
     @Body('members') memberDto: MembersDto,
     @Param('slug') slug: string,
   ): Promise<MemberResponseInterface> {
