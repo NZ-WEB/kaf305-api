@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { PublicationEntity } from '@app/publications/publication.entity';
 
 @Entity()
 export class MembersEntity {
@@ -41,6 +48,10 @@ export class MembersEntity {
   @Column({ default: '' })
   avatar: string;
 
+  @ManyToMany(() => PublicationEntity)
+  @JoinTable()
+  publications: PublicationEntity[];
+
   // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   // education: Date;
   //
@@ -51,9 +62,6 @@ export class MembersEntity {
   // updateTimestamp() {
   //   this.updatedAt = new Date();
   // }
-
-  @Column('simple-array')
-  publications: string[];
 
   // @ManyToOne(() => UserEntity, (user) => user.memberss, { eager: true })
   // author: UserEntity;

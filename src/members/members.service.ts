@@ -7,6 +7,7 @@ import { MembersDto } from '@app/members/dto/members.dto';
 import { MemberResponseInterface } from '@app/members/types/memberResponse.interface';
 import slugify from 'slugify';
 import { MembersResponseInterface } from '@app/members/types/membersResponse.interface';
+import { PublicationEntity } from '@app/publications/publication.entity';
 
 @Injectable()
 export class MembersService {
@@ -15,6 +16,8 @@ export class MembersService {
     private readonly membersRepository: Repository<MembersEntity>,
     @InjectRepository(MembersEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(PublicationEntity)
+    private readonly publicationRepository: Repository<PublicationEntity>,
   ) {}
 
   async findAll(query: any): Promise<MembersResponseInterface> {
@@ -42,6 +45,7 @@ export class MembersService {
 
     return { members, membersCount };
   }
+
   async createMember(
     currentUser: UserEntity,
     membersDto: MembersDto,
@@ -59,7 +63,18 @@ export class MembersService {
   }
 
   async findBySlug(slug: string): Promise<MembersEntity> {
-    return await this.membersRepository.findOne({ slug: slug });
+    const { id } = await this.membersRepository.findOne({ slug });
+
+    if (!id) {
+      throw new HttpException(
+        'Работник кафедры c таким ID не найден',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return await this.membersRepository.findOne(id, {
+      relations: ['publications'],
+    });
   }
 
   async deleteMember(slug: string): Promise<DeleteResult> {

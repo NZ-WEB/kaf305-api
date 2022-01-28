@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import ormconfig from '@app/ormconfig';
 import { AuthMiddleware } from '@app/user/middlewares/auth.middleware';
 import { MembersModule } from './members/members.module';
+import { PublicationsModule } from './publications/publications.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MembersModule } from './members/members.module';
     TypeOrmModule.forRoot(ormconfig),
     UserModule,
     MembersModule,
+    PublicationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
