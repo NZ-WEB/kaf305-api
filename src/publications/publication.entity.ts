@@ -13,4 +13,7 @@ export class PublicationEntity {
 
   @Column({ default: '' })
   body: string;
+
+  @Column({ default: '' })
+  published: string;
 }

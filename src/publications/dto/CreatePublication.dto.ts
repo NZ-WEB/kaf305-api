@@ -9,4 +9,7 @@ export class CreatePublicationDto {
 
   @IsNotEmpty()
   readonly authorId: number;
+
+  @IsNotEmpty()
+  readonly published: string;
 }

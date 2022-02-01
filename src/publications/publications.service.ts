@@ -1,12 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository } from 'typeorm';
+import { DeleteResult, getRepository, Repository } from 'typeorm';
 import { PublicationEntity } from '@app/publications/publication.entity';
 import { MembersEntity } from '@app/members/members.entity';
 import { PublicationResponseInterface } from '@app/publications/types/PublicationResponse.interface';
 import { CreatePublicationDto } from '@app/publications/dto/CreatePublication.dto';
 import slugify from 'slugify';
 import { PublicationsResponseInterface } from '@app/publications/types/PublicationsResponse.interface';
+import { UpdatePublicationDto } from '@app/publications/dto/UpdatePublication.dto';
 
 @Injectable()
 export class PublicationsService {
@@ -58,19 +59,54 @@ export class PublicationsService {
     author.publications.push(addedPublication);
     await this.membersRepository.save(author);
 
-    const new1 = await this.publicationRepository.save(publication);
+    return await this.publicationRepository.save(publication);
+  }
 
-    this.membersRepository
-      .findOne(id, { relations: ['publications'] })
-      .then((i) => console.log(i, 'iii'));
+  async findBySlug(slug: string): Promise<PublicationEntity> {
+    const { id } = await this.publicationRepository.findOne({ slug });
 
-    return new1;
+    if (!id) {
+      throw new HttpException(
+        'Публикация с таким ID не найдена',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return await this.publicationRepository.findOne(id);
   }
 
   async buildPublicationsResponse(
     publications: PublicationEntity,
   ): Promise<PublicationResponseInterface> {
     return { publications };
+  }
+
+  async deleteBySlug(slug: string): Promise<DeleteResult> {
+    const publications = await this.findBySlug(slug);
+
+    if (!publications) {
+      throw new HttpException(
+        'Работник кафедры не найден',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return await this.publicationRepository.delete({ slug });
+  }
+
+  async updatePublication(
+    publicationDto: UpdatePublicationDto,
+    slug: string,
+  ): Promise<PublicationEntity> {
+    const publication = await this.findBySlug(slug);
+
+    if (!publication) {
+      throw new HttpException('Такой публикации нет', HttpStatus.NOT_FOUND);
+    }
+
+    Object.assign(publication, publicationDto);
+
+    return this.publicationRepository.save(publication);
   }
 
   private getSlug(title: string): string {
